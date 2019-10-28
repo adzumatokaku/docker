@@ -1,0 +1,57 @@
+# Creates hadoop-3.1.2
+#
+# docker build -t vtenisheva/serendipity:namenode .
+
+FROM centos:7
+MAINTAINER vtenisheva
+
+USER root
+
+# install some tools
+RUN yum install -y curl wget sudo ip openssh-server unzip
+
+# install JDK8
+RUN yum install -y java-1.8.0-openjdk 
+RUN yum install -y java-1.8.0-openjdk-devel
+
+# get hadoop
+RUN mkdir -p /usr/local/hadoop/
+COPY ./hadoop-3.1.2.tar.gz .
+RUN tar -xzf hadoop-3.1.2.tar.gz -C /usr/local/hadoop
+RUN ln -s /usr/local/hadoop/hadoop-3.1.2 /usr/local/hadoop/current
+
+# volume for namenode
+RUN mkdir -p /opt/mount{1,2}/namenode-dir
+
+# pseudo distributed
+WORKDIR /usr/local/hadoop/current/etc/hadoop
+RUN rm -rf hadoop-env.sh
+COPY hadoop-env.sh .
+
+RUN rm -rf core-site.xml
+COPY core-site.xml .
+
+RUN rm -rf hdfs-site.xml
+COPY hdfs-site.xml .
+
+RUN rm -rf yarn-site.xml
+COPY yarn-site.xml .
+
+# add HADOOP_HOME
+RUN echo "export HADOOP_HOME=/usr/local/hadoop/current" >> /etc/profile
+RUN source /etc/profile
+ENV HADOOP_HOME=/usr/local/hadoop/current
+
+# formating
+RUN $HADOOP_HOME/bin/hdfs namenode -format cluster1
+RUN rm -rf /tmp/*.pid
+
+# run daemons
+COPY start.sh /
+ENTRYPOINT ["sh", "/start.sh"]
+#RUN $HADOOP_HOME/bin/yarn --daemon start resourcemanager
+#RUN $HADOOP_HOME/bin/hadoop --daemon start namenode
+
+# ports
+EXPOSE 9870 8020 8088
+

@@ -22,7 +22,7 @@ RUN ln -s /usr/local/hadoop/hadoop-3.1.2 /usr/local/hadoop/current
 
 # volume for datanode
 RUN mkdir -p /opt/mount{1,2}/datanode-dir
-RUN sudo mkdir -p /opt/mount{1,2}/nodemanager-{local,log}-dir
+RUN mkdir -p /opt/mount{1,2}/nodemanager-{local,log}-dir
 
 # pseudo distributed
 WORKDIR /usr/local/hadoop/current/etc/hadoop
@@ -50,5 +50,5 @@ ENTRYPOINT ["sh", "/start2.sh"]
 #$HADOOP_HOME/bin/hadoop --daemon start datanode
 
 # ports
-EXPOSE 9864
+EXPOSE 9864 8020
 

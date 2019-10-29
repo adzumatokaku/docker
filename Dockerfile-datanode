@@ -16,13 +16,16 @@ RUN yum install -y java-1.8.0-openjdk-devel
 
 # get hadoop
 RUN mkdir -p /usr/local/hadoop/
-COPY ./hadoop-3.1.2.tar.gz .
+
+RUN wget http://archive.apache.org/dist/hadoop/common/hadoop-3.1.2/hadoop-3.1.2.tar.gz 
 RUN tar -xzf hadoop-3.1.2.tar.gz -C /usr/local/hadoop
 RUN ln -s /usr/local/hadoop/hadoop-3.1.2 /usr/local/hadoop/current
 
 # volume for datanode
 RUN mkdir -p /opt/mount{1,2}/datanode-dir
 RUN mkdir -p /opt/mount{1,2}/nodemanager-{local,log}-dir
+RUN chmod 666 /opt/mount{1,2}/datanode-dir
+RUN chmod 666 /opt/mount{1,2}/nodemanager-{local,log}-dir
 
 # pseudo distributed
 WORKDIR /usr/local/hadoop/current/etc/hadoop
@@ -50,5 +53,5 @@ ENTRYPOINT ["sh", "/start2.sh"]
 #$HADOOP_HOME/bin/hadoop --daemon start datanode
 
 # ports
-EXPOSE 9864 8020
+EXPOSE 9864
 

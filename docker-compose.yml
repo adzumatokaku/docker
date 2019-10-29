@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  namenode:
+    image: namenode
+    container_name: namenode
+    ports:
+      - 9870:9870
+      - 8020:8020
+    volumes:
+      - ./namenode1:/opt/mount1/namenode-dir
+      - ./namenode2:/opt/mount2/namenode-dir
+    environment:
+      - CLUSTER_NAME=cluster1
+    env_file:
+      - ./hadoop-env.sh
+
+  datanode:
+    image: datanode
+    container_name: datanode
+    volumes:
+      - ./datanode1:/opt/mount1/datanode-dir
+      - ./datanode2:/opt/mount2/datanode-dir
+ #   environment:
+ #     SERVICE_PRECONDITION: "namenode:9870"
+    links:
+      - namenode
+    env_file:
+      - ./hadoop-env.sh
+  
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+ 
